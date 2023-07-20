@@ -23,7 +23,8 @@ class WhatsWebScraper:
         self.contato_bot = contato_bot
         self.timeout = 4
         self.exceptions_count = 0
-        self.log_file = dir_path + "/logs/wa_exceptions.log"
+        self.log_dir = "logs/"
+        self.log_file = dir_path + "/" + self.log_dir + "wa_exceptions.log"
         self.abre_whatsapp_chrome()
 
     def get_exceptions_counter(self):
@@ -31,6 +32,8 @@ class WhatsWebScraper:
 
     def set_exception_log_and_inc_count(self, e):
         self.exceptions_count += 1
+        if not os.path.isdir("./" + self.log_dir):
+            os.mkdir("logs")
         csv = open(self.log_file, "a")
         csv.write(str(e))
         csv.close()
@@ -175,7 +178,8 @@ class WhatsWebScraper:
                                                                 ' .//span[@data-testid="icon-unread-count"]]'
                                                                 '//span[@data-testid="icon-unread-count"]')
             for span in span_elements:
-                total += int(span.text)
+                if span.text != "":
+                    total += int(span.text)
             qtd = len(span_elements)
             print("qtd msg nao lidas", total, "qtd conversas nao respondidas", qtd)
         except StaleElementReferenceException as e:

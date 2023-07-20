@@ -1,11 +1,15 @@
 import time
+import os
 from chatbot_utils import ChatBotBr
 from whatsweb_utils import WhatsWebScraper
 
-#Setamos nosso bot passando o nome do mesmo.
+#cria diretorio de profile caso nao exista
+if not os.path.isdir("./profile"):
+    os.mkdir("profile")
 
+#Setamos nosso bot passando o nome do mesmo.
 nome_bot = 'Aki Sushi Bar'
-bot = ChatBotBr(nome_bot, 'chats')
+bot = ChatBotBr(nome_bot, 'dados_treino')
 
 wa_driver = WhatsWebScraper(nome_bot)
 # Iniciamos o bot informando o grupo/pessoa que vamos conversar.
@@ -16,6 +20,7 @@ wa_driver.abre_conversa_contato('TESTE BOT')
 
 #Setamos a váriável último texto sem nada.
 ultima_msg_tupla = ('', '', '')
+
 
 try:
     while True:

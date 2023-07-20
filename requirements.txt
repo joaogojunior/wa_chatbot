@@ -1,0 +1,4 @@
+ChatterBot==1.0.4
+PyYAML==3.12
+pytz~=2023.3
+selenium~=4.10.0

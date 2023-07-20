@@ -5,7 +5,13 @@ from chatterbot.trainers import ChatterBotCorpusTrainer
 
 # bugfix PyYaml 3.12
 import collections.abc
+
 collections.Hashable = collections.abc.Hashable
+
+# bugfix pytz
+import time
+
+time.clock = time.perf_counter
 
 
 class ChatBotBr:
