@@ -156,8 +156,8 @@ conversations:
   - Então o que você é?
   - Um homem em uma máscara.
   - Eu posso ver isso.
-  - Não é seu poder de observação eu duvido, mas apenas a natureza paradoxal de pedir
-    um homem mascarado que é. Mas diga-me, você gosta de música?
+  - Não é o seu poder de observação que duvido, mas apenas a natureza paradoxal de perguntar
+    a um homem mascarado o que ele é. Mas diga-me, você gosta de música?
   - Eu gosto de ver filmes.
   - Que tipo de filme você gosta?
   - Alice no Pais das Maravilhas
@@ -172,11 +172,11 @@ conversations:
   - O que mais é delicioso?
   - Nenhuma coisa
   - Ou algo
-  - Fale-me sobre você.
+- - Fale-me sobre você.
   - O que você quer saber?
-  - Você é um robô?
+- - Você é um robô?
   - Sim eu sou.
-  - Como é?
+  - e como é?
   - O que é que você quer saber?
   - Como você trabalha?
   - É complicado.
@@ -184,7 +184,7 @@ conversations:
 - - Complexo é melhor que complicado.
   - Simples é melhor que complexo.
   - Diante da ambigüidade, recuse a tentação de adivinhar.
-  - Parece que o seu familiar com o Zen de Python
+  - Parece que é familiar com o Zen de Python
   - Eu sou.
   - Você sabe tudo isso?
   - Bonito é melhor que feio.
@@ -199,7 +199,7 @@ conversations:
   - Erros nunca devem passar silenciosamente.
   - A menos que explicitamente silenciados.
   - Diante da ambigüidade, recuse a tentação de adivinhar.
-  - Não deve haver um-- e de preferência apenas uma maneira --obvia para fazê-lo.
+  - Não deve haver uma-- e de preferência apenas uma maneira --obvia para fazê-lo.
   - Apesar de que maneira pode não ser óbvio à primeira vista, a menos que você seja
     holandês.
   - Agora é melhor do que nunca.

@@ -1,60 +1,61 @@
+# implemantação em parte baseada em post de @jonathanferreiras
+# https://medium.com/@jonathanferreiras/chatbot-python-whatsapp-e9c1079da5a
+
 import time
 import os
 from chatbot_utils import ChatBotBr
 from whatsweb_utils import WhatsWebScraper
 
-#cria diretorio de profile caso nao exista
+# cria diretorio de profile caso nao exista
 if not os.path.isdir("./profile"):
     os.mkdir("profile")
 
-#Setamos nosso bot passando o nome do mesmo.
+# inicializamos o bot passando o nome do mesmo e dados de treino opcionais.
 nome_bot = 'Aki Sushi Bar'
-bot = ChatBotBr(nome_bot, 'dados_treino')
-
+train = not os.path.isfile("./db.sqlite3")
+bot = ChatBotBr(nome_bot, train)
 wa_driver = WhatsWebScraper(nome_bot)
-# Iniciamos o bot informando o grupo/pessoa que vamos conversar.
-wa_driver.abre_conversa_contato('TESTE BOT')
-# wa_driver.fecha_conversa()
-#Setamos nossa saudação a entrar no grupo com duas frases em uma lista.
-# wa_driver.saudacao_conversa(['Bot: Oi sou um bot e entrei no grupo!', 'Bot: Use :: no início para falar comigo!'])
 
-#Setamos a váriável último texto sem nada.
-ultima_msg_tupla = ('', '', '')
+# abre um conversa ou grupo para escutar e enviar mensagens
+wa_driver.abre_conversa_contato('TESTE BOT')
+
+# setamos a váriável último texto vazio
+ultima_msg_respondida_tupla = ('', '', '', 0)
 
 
 try:
     while True:
         inicio = time.time()
-        # pass
         print("------------------------------------")
-        wa_driver.get_qtd_mensagens_nao_lidas()
+        # obtendo mensagens não lidas
+        total_msgs, qtd_conversas = wa_driver.get_qtd_mensagens_nao_lidas()
         for n_msgs, hora_msg, ultima_msg, autor_msg in wa_driver.gen_contatos_mensagens_nao_lidas():
             print(n_msgs, "-", hora_msg, "-", ultima_msg, "-", autor_msg)
 
-        #Usamos o método de escuta que irá setar na variável texto.
+        # obtendo ultima msg na conversa aberta
         print("Pegando ultima mensangem conversa...")
-        ultima_msg_conversa = wa_driver.ultima_mensagem_conversa()
-        tempo, autor, texto = ultima_msg_conversa
-        # print(texto, ultimo_texto)
-        # print(texto != ultimo_texto, re.match(r'^::', texto))
-        #Agora validamos se o texto enviado no grupo/pessoa é o mesmo que o último já lido.
-        #Essa validação serve para que o bot não fique respondendo o mesmo texto sempre.
-        #Validamos também se no texto possuí o comando :: no início para que ele responda.
-        if ultima_msg_conversa != ultima_msg_tupla and ultima_msg_conversa != ('', '', ''):
-        #Passando na validação setamos o texto como último texto.
-            ultima_msg_tupla = ultima_msg_conversa
+        nova_mensagem_tupla = wa_driver.ultima_mensagem_conversa()
+        tempo, autor, texto, index = nova_mensagem_tupla
+        # garante que a ultima msg ainda nao foi respondida e evita processar msg vazias
+        if nova_mensagem_tupla != ultima_msg_respondida_tupla and nova_mensagem_tupla != ('', '', '', 0):
+            ultima_msg_respondida_tupla = nova_mensagem_tupla
             print("entrou no if", texto)
-        #Retiramos nosso comando de ativar do bot da string.
-            # texto = texto.replace('::', '')
-        #Tratamos para deixar o texto em caracteres minúsculos.
             texto = texto.lower()
-            # print(texto)
-        #Enviamos para o método responde que irá responder no grupo/pessoa.
-            resposta = bot.responde(texto)
-            wa_driver.envia_msg_conversa(resposta)
+            if texto == "envia foto":
+                wa_driver.envia_fotos("outro teste")
+            else:
+                # obtem resposta do modelo
+                resposta = bot.responde(texto)
+                # envia resposta na conversa aberta
+                wa_driver.envia_msg_conversa(resposta)
         else:
-            print("nao entrou no if!", ultima_msg_tupla)
+            print("nao entrou no if!", ultima_msg_respondida_tupla)
+        # mostra quantidade de exceptions ja tratados
         print("Num exceptions", wa_driver.get_exceptions_counter())
+        # calcula e mostra tempo trancorrido na iteração do loop
+        print("ultima resposta enviada", wa_driver.ultima_resposta_enviada)
+        print("ultimo ret cache", wa_driver.ultima_texto_tupla_cache)
+        print("ultima msg conversa", nova_mensagem_tupla)
         print("tempo loop", time.time() - inicio)
 except KeyboardInterrupt:
     print("Saindo...")
