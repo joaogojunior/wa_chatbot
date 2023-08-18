@@ -24,38 +24,49 @@ ultima_msg_respondida_tupla = ('', '', '', 0)
 
 
 try:
+    last_count = 0
     while True:
         inicio = time.time()
         print("------------------------------------")
+        total_msgs = len(wa_driver.get_list_elements_from_xpath(WhatsWebScraper.TODAS_MSGS_CONVERSA))
+        # if total_msgs > 0:
+        #     print('total conversas:', total_msgs)
         # obtendo mensagens não lidas
-        total_msgs, qtd_conversas = wa_driver.get_qtd_mensagens_nao_lidas()
-        for n_msgs, hora_msg, ultima_msg, autor_msg in wa_driver.gen_contatos_mensagens_nao_lidas():
-            print(n_msgs, "-", hora_msg, "-", ultima_msg, "-", autor_msg)
+        total_msgs_novas, qtd_conversas_novas = wa_driver.get_qtd_mensagens_nao_lidas()
+        if total_msgs_novas > 0:
+            print("qtd msg nao lidas", total_msgs_novas, "qtd conversas nao respondidas", qtd_conversas_novas)
+            for n_msgs, hora_msg, ultima_msg, autor_msg in wa_driver.gen_tuplas_mensagens_nao_lidas():
+                print(n_msgs, "-", hora_msg, "-", ultima_msg, "-", autor_msg)
 
         # obtendo ultima msg na conversa aberta
-        print("Pegando ultima mensangem conversa...")
+        # print("Pegando ultima mensangem conversa...")
         nova_mensagem_tupla = wa_driver.ultima_mensagem_conversa()
         tempo, autor, texto, index = nova_mensagem_tupla
         # garante que a ultima msg ainda nao foi respondida e evita processar msg vazias
         if nova_mensagem_tupla != ultima_msg_respondida_tupla and nova_mensagem_tupla != ('', '', '', 0):
             ultima_msg_respondida_tupla = nova_mensagem_tupla
-            print("entrou no if", texto)
+            print("processando resposta:", texto)
             texto = texto.lower()
             if texto == "envia foto":
-                wa_driver.envia_fotos("outro teste")
+                wa_driver.envia_fotos("Nossas ofertas de hoje!")
+                # pass
             else:
                 # obtem resposta do modelo
                 resposta = bot.responde(texto)
                 # envia resposta na conversa aberta
                 wa_driver.envia_msg_conversa(resposta)
-        else:
-            print("nao entrou no if!", ultima_msg_respondida_tupla)
+        # else:
+        #     print("nao entrou no if!", ultima_msg_respondida_tupla)
         # mostra quantidade de exceptions ja tratados
-        print("Num exceptions", wa_driver.get_exceptions_counter())
+        cur_count = wa_driver.get_exceptions_counter()
+        # if cur_count - last_count > 0:
+        #     last_count = cur_count
+        print("Num exceptions", cur_count)
+        if wa_driver.ultima_resposta_enviada is not None:
+            print("ultima resposta enviada", wa_driver.ultima_resposta_enviada)
+        if nova_mensagem_tupla != ('', '', '', 0):
+            print("ultima msg de contato", nova_mensagem_tupla)
         # calcula e mostra tempo trancorrido na iteração do loop
-        print("ultima resposta enviada", wa_driver.ultima_resposta_enviada)
-        print("ultimo ret cache", wa_driver.ultima_texto_tupla_cache)
-        print("ultima msg conversa", nova_mensagem_tupla)
         print("tempo loop", time.time() - inicio)
 except KeyboardInterrupt:
     print("Saindo...")

@@ -97,9 +97,26 @@ class Scraper:
             lista = []
         return lista
 
+    def get_list_elements_from_css(self, css, el=None):
+        if el is None:
+            el = self.driver
+        try:
+            lista = el.find_elements(By.CSS_SELECTOR, css)
+        except StaleElementReferenceException as e:
+            self.set_exception_log_and_inc_count(e)
+            print("Tratando Stale Element Exception, retornando lista vazia...")
+            lista = []
+        except WebDriverException as e:
+            self.set_exception_log_and_inc_count(e)
+            print("Tratando WebDriver Exception, retornando lista vazia...")
+            lista = []
+        return lista
+
     def get_child_text_by_css_selector(self, css_select, default_texto, el=None):
         texto = default_texto
         if el is not None:
+            if len(self.get_list_elements_from_css(css_select, el)) == 0:
+                return texto
             try:
                 texto = el.find_element(By.CSS_SELECTOR, css_select).text
             except StaleElementReferenceException as e:
@@ -116,6 +133,8 @@ class Scraper:
     def get_child_text_by_xpath(self, xpath, default_texto, el=None):
         texto = default_texto
         if el is not None:
+            if len(self.get_list_elements_from_xpath(xpath, el)) == 0:
+                return texto
             try:
                 texto = el.find_element(By.XPATH, xpath).text
             except StaleElementReferenceException as e:
@@ -132,6 +151,8 @@ class Scraper:
     def get_child_attribute_by_xpath(self, xpath, atributo, default_texto, el=None):
         texto = default_texto
         if el is not None:
+            if len(self.get_list_elements_from_xpath(xpath, el)) == 0:
+                return texto
             try:
                 texto = el.find_element(By.XPATH, xpath).get_attribute(atributo)
             except StaleElementReferenceException as e:
@@ -145,25 +166,10 @@ class Scraper:
                 print("WebDriver Exception retornando", texto, "...")
         return texto
 
-    #
-    # def get_element_xpath_js(self, xpath, el):
-    #     _xpath = self.get_xpath_from_element(el)
-    #     script = \
-    #         "function getXPath(parent_selector, selector) {\
-    #             const context = document.evaluate(parent_selector, document, null, XPathResult.\
-    #                                             ORDERED_NODE_SNAPSHOT_TYPE, null);\
-    #             const found = document.evaluate(selector, context, null, XPathResult.\
-    #                                             ORDERED_NODE_SNAPSHOT_TYPE, null);\
-    #             return found\
-    #             }\
-    #         return getXPath(arguments[0], arguments[1])"
-    #     print(_xpath, xpath)
-    #     return self.driver.execute_script(script, _xpath, xpath)
-
     def get_xpath_from_element(self, el):
         # casos bases - se há um node com id para iniciar xpath ou se chegamos na raiz (document.body)
         if el.get_attribute("id") != "":  # and el.get_attribute("id") is not None:
-            return 'id(\"' + el.get_attribute("id") + '\")'
+            return 'id("' + el.get_attribute("id") + '")'
         elif el == self.get_list_elements_from_xpath("/html/body")[0]:
             return "/html/body"
         ix = 1
